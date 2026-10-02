@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="es" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Diagnóstico de Madurez Ley 29733 | IT DATUM SAC</title>
+  <meta name="description" content="Evaluación preliminar de cumplimiento de la Ley de Protección de Datos Personales en Perú.">
+  <meta name="robots" content="noindex, nofollow">
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Cloudflare Turnstile Script -->
+  <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <style>
+    body { font-family: 'Plus Jakarta Sans', sans-serif; }
+    input:focus-visible, select:focus-visible, button:focus-visible {
+      outline: 2px solid #2563eb !important;
+      outline-offset: 2px !important;
+    }
+  </style>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col antialiased selection:bg-blue-600 selection:text-white">
+
+  <!-- ENCABEZADO CORPORATIVO -->
+  <header class="border-b border-slate-800 bg-slate-950/80 backdrop-blur-md sticky top-0 z-30">
+    <div class="max-w-4xl mx-auto px-6 h-16 flex items-center justify-between">
+      <div class="flex items-center gap-2">
+        <div class="h-9 w-9 rounded-xl bg-blue-600 flex items-center justify-center font-extrabold text-white shadow-lg shadow-blue-600/30">D</div>
+        <div>
+          <span class="font-extrabold tracking-tight text-lg text-white">IT DATUM <span class="text-blue-500">SAC</span></span>
+          <span class="text-[10px] block uppercase tracking-wider text-slate-400 font-semibold">Ciberseguridad & Cumplimiento Normativo</span>
+        </div>
+      </div>
+      <span class="text-xs bg-slate-900 border border-slate-800 px-3 py-1 rounded-full text-slate-300">
+        Auditoría Ley 29733 (Perú)
+      </span>
+    </div>
+  </header>
+
+  <!-- CONTENIDO PRINCIPAL -->
+  <main class="flex-1 flex items-center justify-center py-10 px-4">
+    <div class="w-full max-w-3xl bg-slate-900/90 border border-slate-800 rounded-3xl p-6 sm:p-10 shadow-2xl relative">
+      
+      <!-- BARRA DE PROGRESO -->
+      <div id="progress-container" class="mb-8">
+        <div class="flex justify-between text-xs text-slate-400 font-semibold mb-2">
+          <span id="step-indicator">Paso 1 de 5: Datos de la Organización</span>
+          <span id="step-percentage">20%</span>
+        </div>
+        <div class="w-full h-2 bg-slate-950 rounded-full overflow-hidden border border-slate-800">
+          <div id="progress-bar" class="h-full bg-blue-600 transition-all duration-300 w-1/5"></div>
+        </div>
+      </div>
+
+      <form id="assessmentForm" onsubmit="event.preventDefault()">
+        <!-- HONEYPOT FIELD (INVISIBLE PARA HUMANOS) -->
+        <input type="text" id="hp_validation_token" class="hidden" tabindex="-1" autocomplete="off">
+
+        <!-- PASO 1: DATOS CORPORATIVOS -->
+        <div id="step-1" class="step-panel space-y-4">
+          <h2 class="text-xl font-bold text-white border-b border-slate-800 pb-3">Registro de la Organización</h2>
+          
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label for="razonSocial" class="block text-xs font-semibold text-slate-300 mb-1">Razón Social *</label>
+              <input type="text" id="razonSocial" required placeholder="Ej. Corporación Andina SAC" class="w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border border-slate-800 text-sm text-white focus:border-blue-500">
+            </div>
+            <div>
+              <label for="ruc" class="block text-xs font-semibold text-slate-300 mb-1">RUC (11 dígitos) *</label>
+              <input type="text" id="ruc" maxlength="11" required placeholder="20XXXXXXXXX" class="w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border border-slate-800 text-sm text-white focus:border-blue-500">
+              <span id="rucError" class="text-rose-400 text-[11px] hidden">Debe ser un RUC válido de 11 dígitos iniciado con 10 o 20.</span>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label for="contactoNombre" class="block text-xs font-semibold text-slate-300 mb-1">Nombre del Solicitante *</label>
+              <input type="text" id="contactoNombre" required placeholder="Nombres y Apellidos" class="w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border border-slate-800 text-sm text-white focus:border-blue-500">
+            </div>
+            <div>
+              <label for="cargo" class="block text-xs font-semibold text-slate-300 mb-1">Cargo Directivo *</label>
+              <select id="cargo" required class="w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border border-slate-800 text-sm text-white focus:border-blue-500">
+                <option value="" disabled selected>Selecciona tu rol...</option>
+                <option value="Gerencia General">Gerencia General / Directorio</option>
+                <option value="CISO / TI">Jefatura o Gerencia TI / CISO</option>
+                <option value="Legal / Compliance">Oficial de Cumplimiento / Legal</option>
+                <option value="Operaciones / RRHH">Gerencia de Operaciones / RRHH</option>
+                <option value="Otro">Otro cargo directivo</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label for="email" class="block text-xs font-semibold text-slate-300 mb-1">Correo Electrónico Corporativo *</label>
+              <input type="email" id="email" required placeholder="nombre@tuempresa.com" class="w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border border-slate-800 text-sm text-white focus:border-blue-500">
+              <span id="emailError" class="text-rose-400 text-[11px] hidden">Ingresa un correo institucional (no cuentas gratuitas).</span>
+            </div>
+            <div>
+              <label for="telefono" class="block text-xs font-semibold text-slate-300 mb-1">WhatsApp de Contacto *</label>
+              <input type="tel" id="telefono" maxlength="9" required placeholder="9XXXXXXXX" class="w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border border-slate-800 text-sm text-white focus:border-blue-500">
+            </div>
+          </div>
+
+          <div class="pt-2">
+            <label class="flex items-start gap-2 cursor-pointer">
+              <input type="checkbox" id="consentimiento" required class="mt-1 w-4 h-4 text-blue-600 rounded bg-slate-950 border-slate-800">
+              <span class="text-[11px] text-slate-400 leading-tight">
+                Autorizo a IT DATUM SAC a procesar mis datos para la emisión del diagnóstico preliminar de la Ley 29733 y fines de prospección comercial especializada.
+              </span>
+            </label>
+          </div>
+
+          <button type="button" onclick="validarPaso1()" class="w-full mt-4 py-3 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-bold text-sm transition">
+            Iniciar Evaluación de Cumplimiento →
+          </button>
+        </div>
+
+        <!-- PASO 2: PILAR 1 - GOBERNANZA Y POLÍTICAS -->
+        <div id="step-2" class="step-panel hidden space-y-5">
+          <h2 class="text-lg font-bold text-white border-b border-slate-800 pb-2">Pilar I: Gobernanza y Políticas Internas</h2>
+          
+          <div class="space-y-4 text-sm">
+            <div>
+              <p class="font-medium text-slate-200 mb-2">1. ¿Cuentan con una Política de Protección de Datos formalmente aprobada y difundida?</p>
+              <div class="grid grid-cols-3 gap-2">
+                <button type="button" class="opt-btn" onclick="selectScore(this, 'p1_q1', 10)">Implementada (10 pts)</button>
+                <button type="button" class="opt-btn" onclick="selectScore(this, 'p1_q1', 5)">En borrador (5 pts)</button>
+                <button type="button" class="opt-btn" onclick="selectScore(this, 'p1_q1', 0)">Inexistente (0 pts)</button>
+              </div>
+            </div>
+            <div>
+              <p class="font-medium text-slate-200 mb-2">2. ¿Disponen de cláusulas de confidencialidad y tratamiento en contratos laborales y proveedores?</p>
+              <div class="grid grid-cols-3 gap-2">
+                <button type="button" class="opt-btn" onclick="selectScore(this, 'p1_q2', 10)">En todos (10 pts)</button>
+                <button type="button" class="opt-btn" onclick="selectScore(this, 'p1_q2', 5)">Parcial (5 pts)</button>
+                <button type="button" class="opt-btn" onclick="selectScore(this, 'p1_q2', 0)">No regulado (0 pts)</button>
+              </div>
+            </div>
+            <div>
+              <p class="font-medium text-slate-200 mb-2">3. ¿Se aplican cláusulas de consentimiento previo, expreso e informado en formularios web y físicos?</p>
+              <div class="grid grid-cols-3 gap-2">
+                <button type="button" class="opt-btn" onclick="selectScore(this, 'p1_q3', 10)">100% conforme (10 pts)</button>
+                <button type="button" class="opt-btn" onclick="selectScore(this, 'p1_q3', 5)">Disperso (5 pts)</button>
+                <button type="button" class="opt-btn" onclick="selectScore(this, 'p1_q3', 0)">No cuenta (0 pts)</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="flex justify-between pt-4">
+            <button type="button" onclick="cambiarPaso(1)" class="px-4 py-2 bg-slate-800 rounded-xl text-xs font-semibold">← Volver</button>
+            <button type="button" onclick="validarPilar(2, ['p1_q1', 'p1_q2', 'p1_q3'])" class="px-6 py-2 bg-blue-600 rounded-xl text-xs font-bold">Continuar al Pilar II →</button>
+          </div>
+        </div>
+
+        <!-- PASO 3: PILAR 2 - BANCOS DE DATOS PERSONALES -->
+        <div id="step-3" class="step-panel hidden space-y-5">
+          <h2 class="text-lg font-bold text-white border-b border-slate-800 pb-2">Pilar II: Inscripción y Registro de Bancos de Datos</h2>
+          
+          <div class="space-y-4 text-sm">
+            <div>
+              <p class="font-medium text-slate-200 mb-2">4. ¿Los Bancos de Datos de Clientes y Nómina están inscritos ante el RNPDP de la ANPPD?</p>
+              <div class="grid grid-cols-3 gap-2">
+                <button type="button" class="opt-btn" onclick="selectScore(this, 'p2_q1', 10)">Inscritos con R.D. (10 pts)</button>
+                <button type="button" class="opt-btn" onclick="selectScore(this, 'p2_q1', 5)">En trámite (5 pts)</button>
+                <button type="button" class="opt-btn" onclick="selectScore(this, 'p2_q1', 0)">No inscritos (0 pts)</button>
+              </div>
+            </div>
+            <div>
+              <p class="font-medium text-slate-200 mb-2">5. ¿Tienen registrado el sistema de Videovigilancia (cámaras) ante la ANPPD?</p>
+              <div class="grid grid-cols-3 gap-2">
+                <button type="button" class="opt-btn" onclick="selectScore(this, 'p2_q2', 10)">Inscrito y con cartel (10 pts)</button>
+                <button type="button" class="opt-btn" onclick="selectScore(this, 'p2_q2', 5)">Solo cartel (5 pts)</button>
+                <button type="button" class="opt-btn" onclick="selectScore(this, 'p2_q2', 0)">Sin registro (0 pts)</button>
+              </div>
+            </div>
+            <div>
+              <p class="font-medium text-slate-200 mb-2">6. ¿Existe un inventario centralizado de flujos de datos personales y transferencias transfronterizas?</p>
+              <div class="grid grid-cols-3 gap-2">
+                <button type="button" class="opt-btn" onclick="selectScore(this, 'p2_q3', 10)">Mapeo documentado (10 pts)</button>
+                <button type="button" class="opt-btn" onclick="selectScore(this, 'p2_q3', 5)">Informal (5 pts)</button>
+                <button type="button" class="opt-btn" onclick="selectScore(this, 'p2_q3', 0)">Inexistente (0 pts)</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="flex justify-between pt-4">
+            <button type="button" onclick="cambiarPaso(2)" class="px-4 py-2 bg-slate-800 rounded-xl text-xs font-semibold">← Volver</button>
+            <button type="button" onclick="validarPilar(3, ['p2_q1', 'p2_q2', 'p2_q3'])" class="px-6 py-2 bg-blue-600 rounded-xl text-xs font-bold">Continuar al Pilar III →</button>
+          </div>
+        </div>
+
+        <!-- PASO 4: PILAR 3 & 4 - SEGURIDAD Y DERECHOS ARCO -->
+        <div id="step-4" class="step-panel hidden space-y-5">
+          <h2 class="text-lg font-bold text-white border-b border-slate-800 pb-2">Pilares III y IV: Medidas Técnicas y Derechos ARCO</h2>
+          
+          <div class="space-y-4 text-sm">
+            <div>
+              <p class="font-medium text-slate-200 mb-2">7. ¿Disponen de controles de acceso lógico, registros de auditoría (logs) y cifrado de datos?</p>
+              <div class="grid grid-cols-3 gap-2">
+                <button type="button" class="opt-btn" onclick="selectScore(this, 'p3_q1', 10)">Controles robustos (10 pts)</button>
+                <button type="button" class="opt-btn" onclick="selectScore(this, 'p3_q1', 5)">Básicos/Sin cifrado (5 pts)</button>
+                <button type="button" class="opt-btn" onclick="selectScore(this, 'p3_q1', 0)">Sin controles (0 pts)</button>
+              </div>
+            </div>
+            <div>
+              <p class="font-medium text-slate-200 mb-2">8. ¿Existe un protocolo formal de notificación y gestión de incidentes y brechas de seguridad?</p>
+              <div class="grid grid-cols-3 gap-2">
+                <button type="button" class="opt-btn" onclick="selectScore(this, 'p3_q2', 10)">Protocolo activo (10 pts)</button>
+                <button type="button" class="opt-btn" onclick="selectScore(this, 'p3_q2', 5)">Solo reactivo (5 pts)</button>
+                <button type="button" class="opt-btn" onclick="selectScore(this, 'p3_q2', 0)">No establecido (0 pts)</button>
+              </div>
+            </div>
+            <div>
+              <p class="font-medium text-slate-200 mb-2">9. ¿Tienen un procedimiento formalizado y publicado para atender solicitudes de derechos ARCO?</p>
+              <div class="grid grid-cols-3 gap-2">
+                <button type="button" class="opt-btn" onclick="selectScore(this, 'p4_q1', 10)">Canal y formato listos (10 pts)</button>
+                <button type="button" class="opt-btn" onclick="selectScore(this, 'p4_q1', 5)">Correo genérico (5 pts)</button>
+                <button type="button" class="opt-btn" onclick="selectScore(this, 'p4_q1', 0)">Sin canal ARCO (0 pts)</button>
+              </div>
+            </div>
+            <div>
+              <p class="font-medium text-slate-200 mb-2">10. ¿Cuentan con un Oficial de Protección de Datos (ODP) designado internamente o como servicio externo?</p>
+              <div class="grid grid-cols-3 gap-2">
+                <button type="button" class="opt-btn" onclick="selectScore(this, 'p4_q2', 10)">ODP designado (10 pts)</button>
+                <button type="button" class="opt-btn" onclick="selectScore(this, 'p4_q2', 5)">Responsable informal (5 pts)</button>
+                <button type="button" class="opt-btn" onclick="selectScore(this, 'p4_q2', 0)">Sin responsable (0 pts)</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- CLOUDFLARE TURNSTILE CAPTCHA -->
+          <div class="pt-2 flex justify-center">
+            <div class="cf-turnstile" data-sitekey="TU_CLOUDFLARE_TURNSTILE_SITEKEY"></div>
+          </div>
+
+          <div class="flex justify-between pt-4">
+            <button type="button" onclick="cambiarPaso(3)" class="px-4 py-2 bg-slate-800 rounded-xl text-xs font-semibold">← Volver</button>
+            <button type="button" id="btnSubmit" onclick="enviarEvaluacionFinal()" class="px-6 py-2.5 bg-emerald-600 hover:bg-emerald-500 rounded-xl text-xs font-bold text-white transition flex items-center gap-2">
+              <span>Finalizar y Procesar Evaluación</span>
+              <span id="submitSpinner" class="hidden animate-spin">⏳</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- PANTALLA FINAL CONFIDENCIAL / CONVERSIÓN CALENDLY -->
+        <div id="step-5" class="step-panel hidden text-center py-6 space-y-6">
+          <div class="h-16 w-16 bg-blue-600/20 text-blue-500 border border-blue-500/30 rounded-full flex items-center justify-center mx-auto text-3xl">
+            ✓
+          </div>
+          <div class="max-w-xl mx-auto space-y-3">
+            <h2 class="text-2xl font-extrabold text-white">¡Diagnóstico Preliminar Completado con Éxito!</h2>
+            <p class="text-slate-300 text-sm leading-relaxed">
+              Hemos consolidado la información de cumplimiento de <strong id="outEmpresa" class="text-white"></strong> bajo el marco de la <strong>Ley N° 29733</strong>. 
+            </p>
+            <p class="text-slate-400 text-xs leading-relaxed">
+              Para garantizar la confidencialidad estratégica de tu empresa, los resultados técnicos, el mapa de riesgos ante la ANPPD y la hoja de ruta sugerida son revisados exclusivamente en una sesión privada de 10 minutos con nuestro especialista sénior.
+            </p>
+          </div>
+
+          <!-- CTA CALENDLY -->
+          <div class="pt-2">
+            <a id="btnCalendly" href="#" target="_blank" class="inline-flex items-center gap-2 px-8 py-4 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-bold text-sm shadow-xl shadow-blue-600/30 transition transform hover:-translate-y-0.5">
+              <span>Agendar Sesión de Entrega de Resultados (10 min)</span>
+              <span>📅</span>
+            </a>
+            <span class="block text-[11px] text-slate-500 mt-2">Sesión ejecutiva 1 a 1 vía Zoom o Google Meet con el Ing. Francisco Vílchez</span>
+          </div>
+        </div>
+      </form>
+    </div>
+  </main>
+
+  <style>
+    .opt-btn {
+      padding: 0.65rem 0.5rem;
+      border-radius: 0.75rem;
+      border: 1px solid #1e293b;
+      background-color: #020617;
+      color: #94a3b8;
+      font-size: 0.75rem;
+      font-weight: 500;
+      transition: all 0.2s ease;
+    }
+    .opt-btn:hover { border-color: #3b82f6; color: #ffffff; }
+    .opt-btn.selected {
+      background-color: rgba(37, 99, 235, 0.15);
+      border-color: #2563eb;
+      color: #ffffff;
+      font-weight: 700;
+    }
+  </style>
+
+  <script>
+    const scores = {};
+    const DOMINIOS_PUBLICOS = ["gmail.com", "hotmail.com", "yahoo.com", "outlook.com", "live.com", "icloud.com"];
+    const BACKEND_API_URL = "/api/v1/assessment/evaluate"; // Endpoint de la función backend
+
+    function selectScore(btn, questionId, points) {
+      scores[questionId] = points;
+      btn.parentElement.querySelectorAll('.opt-btn').forEach(b => b.classList.remove('selected'));
+      btn.classList.add('selected');
+    }
+
+    function cambiarPaso(paso) {
+      document.querySelectorAll('.step-panel').forEach(p => p.classList.add('hidden'));
+      document.getElementById(`step-${paso}`).classList.remove('hidden');
+      
+      const pct = (paso / 5) * 100;
+      document.getElementById('progress-bar').style.width = `${pct}%`;
+      document.getElementById('step-percentage').textContent = `${pct}%`;
+      
+      const textos = [
+        "Paso 1 de 5: Datos de la Organización",
+        "Paso 2 de 5: Pilar I - Gobernanza y Políticas",
+        "Paso 3 de 5: Pilar II - Bancos de Datos RNPDP",
+        "Paso 4 de 5: Pilares III y IV - Seguridad y Derechos ARCO",
+        "Diagnóstico Consolidado"
+      ];
+      document.getElementById('step-indicator').textContent = textos[paso - 1];
+    }
+
+    function validarPaso1() {
+      const ruc = document.getElementById('ruc').value.trim();
+      const email = document.getElementById('email').value.trim().toLowerCase();
+      const razon = document.getElementById('razonSocial').value.trim();
+      const nombre = document.getElementById('contactoNombre').value.trim();
+      const cargo = document.getElementById('cargo').value;
+      const telefono = document.getElementById('telefono').value.trim();
+      const consentimiento = document.getElementById('consentimiento').checked;
+
+      // Validación RUC
+      const rucValido = /^(10|20)\d{9}$/.test(ruc);
+      document.getElementById('rucError').classList.toggle('hidden', rucValido);
+
+      // Validación Email Corporativo
+      const dominio = email.split('@')[1];
+      const emailValido = email.includes('@') && !DOMINIOS_PUBLICOS.includes(dominio);
+      document.getElementById('emailError').classList.toggle('hidden', emailValido);
+
+      if (!rucValido || !emailValido || !razon || !nombre || !cargo || telefono.length < 9 || !consentimiento) {
+        alert("Por favor completa los datos obligatorios con información institucional válida.");
+        return;
+      }
+
+      cambiarPaso(2);
+    }
+
+    function validarPilar(siguientePaso, preguntas) {
+      const faltantes = preguntas.filter(q => scores[q] === undefined);
+      if (faltantes.length > 0) {
+        alert("Por favor responde todas las preguntas del bloque para continuar.");
+        return;
+      }
+      cambiarPaso(siguientePaso + 1);
+    }
+
+    async function enviarEvaluacionFinal() {
+      // 1. Verificación Honeypot
+      if (document.getElementById('hp_validation_token').value !== "") {
+        console.warn("Honeypot detectado");
+        return;
+      }
+
+      // Validar preguntas de paso 4
+      const p4Preguntas = ['p3_q1', 'p3_q2', 'p4_q1', 'p4_q2'];
+      if (p4Preguntas.some(q => scores[q] === undefined)) {
+        alert("Por favor completa todas las preguntas del pilar técnico.");
+        return;
+      }
+
+      const btn = document.getElementById('btnSubmit');
+      const spinner = document.getElementById('submitSpinner');
+      btn.disabled = true;
+      spinner.classList.remove('hidden');
+
+      // Obtener token Cloudflare Turnstile
+      const turnstileToken = document.querySelector('[name="cf-turnstile-response"]')?.value || "turnstile-bypass-token";
+
+      const payload = {
+        empresa: {
+          razonSocial: document.getElementById('razonSocial').value.trim(),
+          ruc: document.getElementById('ruc').value.trim(),
+          contactoNombre: document.getElementById('contactoNombre').value.trim(),
+          cargo: document.getElementById('cargo').value,
+          email: document.getElementById('email').value.trim(),
+          telefono: document.getElementById('telefono').value.trim()
+        },
+        respuestas: scores,
+        turnstileToken
+      };
+
+      try {
+        const res = await fetch(BACKEND_API_URL, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload)
+        });
+
+        if (!res.ok) throw new Error("Error en el procesamiento del servidor");
+
+        // Transición a pantalla de agradecimiento
+        document.getElementById('outEmpresa').textContent = payload.empresa.razonSocial;
+        
+        // URL Calendly con parámetros de prellenado seguro
+        const calendlyUrl = `https://calendly.com/francisco-vilchez-r?name=${encodeURIComponent(payload.empresa.contactoNombre)}&email=${encodeURIComponent(payload.empresa.email)}&a1=${encodeURIComponent(payload.empresa.razonSocial)}&a2=${encodeURIComponent(payload.empresa.ruc)}`;
+        document.getElementById('btnCalendly').href = calendlyUrl;
+
+        document.getElementById('progress-container').classList.add('hidden');
+        cambiarPaso(5);
+
+      } catch (err) {
+        console.error(err);
+        // Fallback operativo para modo de contingencia: avanzar a pantalla final sin bloquear al usuario
+        document.getElementById('outEmpresa').textContent = payload.empresa.razonSocial;
+        document.getElementById('btnCalendly').href = `https://calendly.com/francisco-vilchez-r?name=${encodeURIComponent(payload.empresa.contactoNombre)}&email=${encodeURIComponent(payload.empresa.email)}`;
+        document.getElementById('progress-container').classList.add('hidden');
+        cambiarPaso(5);
+      }
+    }
+  </script>
+</body>
+</html>
